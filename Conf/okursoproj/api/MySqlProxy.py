@@ -59,8 +59,11 @@ class OKursoProxy(DbPessoa):
                 super().insertUsuario(self.dbCursor,
                                       f"insert into Usuario(nome,email,cpf,senha) values ('{nome}', '{email}', {cpf}, '{senha}');")
                 print(f'{CYAN}Usuario {nome} cadastrado com sucesso!{RESET}')
+                return True
+            
             except Exception as e:
                 print(f'{RED}{e}{RESET}')
+                return False
 
     def deleteUsuario(self, pk):
         if self.isPermission():
