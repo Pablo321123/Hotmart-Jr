@@ -37,13 +37,14 @@ class ProgramacaoSerializer(serializers.Serializer):
         else:
             rows = responseProxy
             result = []
-            keys = ['comprador', 'idCurso', 'nomeCurso', 'duracao', 'categoria', 'descricao', 'autor']
+            keys = ['comprador', 'idCurso', 'nomeCurso',
+                    'duracao', 'categoria', 'descricao', 'autor']
 
             for row in rows:
                 result.append(dict(zip(keys, row)))
 
             return result  # json.dumps(result)
-    
+
     @staticmethod
     def getModules(idCurso):
         okursoProxy = OKursoProxy('Pablo', '1234')
@@ -60,7 +61,7 @@ class ProgramacaoSerializer(serializers.Serializer):
                 result.append(dict(zip(keys, row)))
 
             return result  # json.dumps(result)
-    
+
     @staticmethod
     def getClass(idCurso, idModulo):
         okursoProxy = OKursoProxy('Pablo', '1234')
@@ -71,13 +72,13 @@ class ProgramacaoSerializer(serializers.Serializer):
         else:
             rows = responseProxy
             result = []
-            keys = ['idModulo', 'nome', 'descricao', 'codCurso']
+            keys = ['idAula', 'duracaoMinutos', 'numero', 'codModulo', 'nomeAula']
             print(responseProxy)
             for row in rows:
                 result.append(dict(zip(keys, row)))
 
             return result  # json.dumps(result)
-    
+
     @staticmethod
     def inserirUsuario(nome, email, cpf, senha):
         okursoProxy = OKursoProxy('Pablo', '1234')
