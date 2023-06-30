@@ -10,9 +10,7 @@ from rest_framework import status
 # Campos serializados
 from .serializers import *
 
-# Create your views here.
-
-
+#Metodos GET
 @api_view(['GET'])
 def programacao(request):
 
@@ -21,9 +19,6 @@ def programacao(request):
     return Response(serialized_programacao, status=status.HTTP_200_OK)
     # return HttpResponse('OK')
 
-# Create your views here.
-
-
 @api_view(['GET'])
 def design(request):
 
@@ -31,20 +26,17 @@ def design(request):
     return Response(serialized_programacao, status=status.HTTP_200_OK)
     # return HttpResponse('OK')
 
-
 @api_view(['GET'])
 def edicao(request):
 
     serialized_programacao = ProgramacaoSerializer.serializerCourses('edicao')
     return Response(serialized_programacao, status=status.HTTP_200_OK)
 
-
 @api_view(['GET'])
 def devops(request):
 
     serialized_programacao = ProgramacaoSerializer.serializerCourses('devops')
     return Response(serialized_programacao, status=status.HTTP_200_OK)
-
 
 @api_view(['GET'])
 def ciencia_dados(request):
@@ -53,6 +45,7 @@ def ciencia_dados(request):
     return Response(serialized_programacao, status=status.HTTP_200_OK)
 
 
+#Métodos POST
 @api_view(['POST'])
 def cadastroUsuario(request):
     # cdc = ciencia de dados -> Categoria no banco Mysql
@@ -65,8 +58,40 @@ def cadastroUsuario(request):
 
     return Response(status=status.HTTP_400_BAD_REQUEST)
 
-
 @api_view(['POST'])
 def efetuarCompra(request):
+    try:
+        if request.data:
+            idCompra = ProgramacaoSerializer.getNextIDCompra()
+            for r in request.data:
+                serialized_insert = ProgramacaoSerializer.efetuarCompra(
+                    idCompra, r['formaDePagamento'], r['precoVenda'], r['codCupom'], r['codCurso'], r['comprador'])
+            return Response(status=status.HTTP_200_OK)
+        
+    except Exception as e:
+        print(e)
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+    # serialized_make = ProgramacaoSerializer.efetuarCompra()
+
+@api_view(['POST'])
+def meusCursos(request):
+    # cdc = ciencia de dados -> Categoria no banco Mysql
     if request.data:
-        pass
+        serialized_cousers = ProgramacaoSerializer.getMyCourses(request.data['cpf'])
+    return Response(serialized_cousers, status=status.HTTP_200_OK)
+
+@api_view(['POST'])
+def meusCursos(request):
+    # cdc = ciencia de dados -> Categoria no banco Mysql
+    if request.data:
+        serialized_cousers = ProgramacaoSerializer.getModules(request.data['idCurso'])
+    return Response(serialized_cousers, status=status.HTTP_200_OK)
+
+@api_view(['POST'])
+def minhasAulas(request):
+    # cdc = ciencia de dados -> Categoria no banco Mysql
+    if request.data:
+        serialized_cousers = ProgramacaoSerializer.getClass(request.data['idCurso'], request.data['idModulo'])
+    return Response(serialized_cousers, status=status.HTTP_200_OK)
+
+

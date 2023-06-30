@@ -1,3 +1,4 @@
+import decimal
 import mysql.connector as mc
 from django.db import connection
 
@@ -15,15 +16,32 @@ class DbPessoa:
         for r in listUsuarios:
             print(r)
 
-    def getCourses(self, comando, cursor):
-        cursor.execute(comando)
+    def getCourses(self, cursor, cpf):
+        cursor.execute(
+            f"SELECT co.comprador, cu.idCurso, cu.nomeCurso, cu.duracao, cu.categoria, cu.descricao, cu.autor FROM COMPRA as co JOIN Curso as cu ON co.codCurso = cu.idCurso WHERE co.comprador = {cpf}")
         return cursor.fetchall()
 
     def insertUsuario(self, cursor, comando):
         cursor.execute(comando)
 
-    def deleteUsuario(self, cursor, pk):        
-            cursor.execute(f"DELETE FROM usuario WHERE cpf = '{pk}'")
+    def deleteUsuario(self, cursor, pk):
+        cursor.execute(f"DELETE FROM usuario WHERE cpf = '{pk}'")
+
+    def makePurchase(self, cursor, idCompra, formaDePagamento, precoVenda, codCupom: str, codCurso, comprador):
+        if codCupom == "":
+            cursor.execute(
+                f"INSERT INTO Compra(idCompra, formaDePagamento, precoVenda, codCupom, codCurso, comprador) VALUES ({idCompra},'{formaDePagamento}', {precoVenda}, null, {codCurso}, {comprador})")
+        else:
+            cursor.execute(
+                f"INSERT INTO Compra(idCompra, formaDePagamento, precoVenda, codCupom, codCurso, comprador) VALUES ({idCompra},'{formaDePagamento}', {precoVenda}, '{codCupom}', {codCurso}, {comprador})")
+
+    def getModules(self, cursor, idCurso):
+        cursor.execute(f"SELECT * FROM Modulo WHERE codCurso = {idCurso};")
+        return cursor.fetchall()
+
+    def getClass(self, cursor, idCurso, idModulo):
+        cursor.execute(f"SELECT * FROM AULA as a JOIN modulo as m ON a.codModulo = m.idModulo JOIN curso as c ON c.idCurso = m.codCurso WHERE a.codModulo = {idModulo} AND c.idCurso = {idCurso};")
+        return cursor.fetchall()
 
 
 class OKursoProxy(DbPessoa):
@@ -41,13 +59,14 @@ class OKursoProxy(DbPessoa):
         if self.isPermission():
             if self.isBdConnected():
                 self.dbCursor.execute(text)
-                super().getResult(self.dbCursor)   
-                print(GREEN + 'Query realizada com sucesso!' + RESET)      
+                super().getResult(self.dbCursor)
+                print(GREEN + 'Query realizada com sucesso!' + RESET)
 
     def buscarCursos(self, categoria):
         try:
             if self.isPermission():
-                tuple = super().getCourses(f"SELECT * FROM Curso WHERE categoria = '{categoria}';", self.dbCursor)
+                tuple = super().getCourses(
+                    f"SELECT * FROM Curso WHERE categoria = '{categoria}';", self.dbCursor)
                 return tuple
         except Exception as e:
             return f"{RED}{e}{RESET}"
@@ -60,7 +79,7 @@ class OKursoProxy(DbPessoa):
                                       f"insert into Usuario(nome,email,cpf,senha) values ('{nome}', '{email}', {cpf}, '{senha}');")
                 print(f'{CYAN}Usuario {nome} cadastrado com sucesso!{RESET}')
                 return True
-            
+
             except Exception as e:
                 print(f'{RED}{e}{RESET}')
                 return False
@@ -73,3 +92,40 @@ class OKursoProxy(DbPessoa):
             except Exception as e:
                 print(f'{RED}{e}{RESET}')
 
+    def makePurchase(self, idCompra, formaDePagamento, precoVenda, codCupom, codCurso, comprador):
+        if self.isPermission():
+            super().makePurchase(self.dbCursor, idCompra, formaDePagamento,
+                                 self.calcOff(codCupom, precoVenda), codCupom, codCurso, comprador)
+            return True
+
+        return False
+
+    # calcula o total do desconto no valor da compra
+    def calcOff(self, cupom, valor):
+        if self.isPermission():
+            if cupom == "":
+                return valor
+            else:
+                self.dbCursor.execute(
+                    f"SELECT porcentagem FROM cupom WHERE idCupom = '{cupom}'")
+                row = self.dbCursor.fetchone()
+                valTotal = float(valor) * float(1 - (row[0]/100))
+                return valTotal
+
+    def nextIdCompra(self):
+        if self.isPermission():
+            self.dbCursor.execute(
+                'SELECT MAX(idCompra) as idCompra FROM COMPRA')
+            row = self.dbCursor.fetchone()
+            return row[0] + 1
+
+    def getCourses(self, cpf):
+        return super().getCourses(self.dbCursor, cpf)
+
+    def getModules(self, idCurso):
+        if self.isPermission():
+            return super().getModules(self.dbCursor, idCurso)
+
+    def getClass(self, idCurso, idModulo):
+        if self.isPermission():
+            return super().getClass(self.dbCursor, idCurso, idModulo)
