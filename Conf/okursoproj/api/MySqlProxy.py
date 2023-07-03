@@ -40,7 +40,13 @@ class DbPessoa:
         return cursor.fetchall()
 
     def getClass(self, cursor, idCurso, idModulo):
-        cursor.execute(f"SELECT * FROM AULA as a JOIN modulo as m ON a.codModulo = m.idModulo JOIN curso as c ON c.idCurso = m.codCurso WHERE a.codModulo = {idModulo} AND c.idCurso = {idCurso};")
+        cursor.execute(
+            f"SELECT * FROM AULA as a JOIN modulo as m ON a.codModulo = m.idModulo JOIN curso as c ON c.idCurso = m.codCurso WHERE a.codModulo = {idModulo} AND c.idCurso = {idCurso};")
+        return cursor.fetchall()
+
+    def login(self, cursor, email, senha):
+        cursor.execute(
+            f"SELECT * FROM Usuario WHERE email = '{email}' AND senha = '{senha}'")
         return cursor.fetchall()
 
 
@@ -129,3 +135,7 @@ class OKursoProxy(DbPessoa):
     def getClass(self, idCurso, idModulo):
         if self.isPermission():
             return super().getClass(self.dbCursor, idCurso, idModulo)
+
+    def login(self, email, senha):
+        if self.isPermission():
+            return super().login(self.dbCursor, email, senha)

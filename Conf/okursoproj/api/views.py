@@ -10,7 +10,9 @@ from rest_framework import status
 # Campos serializados
 from .serializers import *
 
-#Metodos GET
+# Metodos GET
+
+
 @api_view(['GET'])
 def programacao(request):
 
@@ -19,6 +21,7 @@ def programacao(request):
     return Response(serialized_programacao, status=status.HTTP_200_OK)
     # return HttpResponse('OK')
 
+
 @api_view(['GET'])
 def design(request):
 
@@ -26,17 +29,22 @@ def design(request):
     return Response(serialized_programacao, status=status.HTTP_200_OK)
     # return HttpResponse('OK')
 
+
 @api_view(['GET'])
 def edicao(request):
 
     serialized_programacao = ProgramacaoSerializer.serializerCourses('edicao')
     return Response(serialized_programacao, status=status.HTTP_200_OK)
 
+
 @api_view(['GET'])
 def devops(request):
 
     serialized_programacao = ProgramacaoSerializer.serializerCourses('devops')
     return Response(serialized_programacao, status=status.HTTP_200_OK)
+
+# cdc = ciencia de dados -> Categoria no banco Mysql
+
 
 @api_view(['GET'])
 def ciencia_dados(request):
@@ -45,7 +53,38 @@ def ciencia_dados(request):
     return Response(serialized_programacao, status=status.HTTP_200_OK)
 
 
-#Métodos POST
+@api_view(['GET'])
+def meusCursos(request):
+
+    if request.GET:
+        serialized_cousers = ProgramacaoSerializer.getMyCourses(
+            request.GET.get('cpf'))
+        return Response(serialized_cousers, status=status.HTTP_200_OK)
+    else:
+        return Response([], status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['GET'])
+def getModulos(request):
+    if request.GET:
+        serialized_modules = ProgramacaoSerializer.getModules(
+            request.GET.get('idCurso'))
+        return Response(serialized_modules, status=status.HTTP_200_OK)
+    else:
+        return Response([], status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['GET'])
+def minhasAulas(request):    
+    if request.GET:
+        serialized_class = ProgramacaoSerializer.getClass(
+            request.GET.get('idCurso'), request.GET.get('idModulo'))
+        return Response(serialized_class, status=status.HTTP_200_OK)
+    else:
+        return Response([], status=status.HTTP_400_BAD_REQUEST)
+
+
+# Métodos POST
 @api_view(['POST'])
 def cadastroUsuario(request):
     # cdc = ciencia de dados -> Categoria no banco Mysql
@@ -58,6 +97,7 @@ def cadastroUsuario(request):
 
     return Response(status=status.HTTP_400_BAD_REQUEST)
 
+
 @api_view(['POST'])
 def efetuarCompra(request):
     try:
@@ -67,31 +107,21 @@ def efetuarCompra(request):
                 serialized_insert = ProgramacaoSerializer.efetuarCompra(
                     idCompra, r['formaDePagamento'], r['precoVenda'], r['codCupom'], r['codCurso'], r['comprador'])
             return Response(status=status.HTTP_200_OK)
-        
+
     except Exception as e:
         print(e)
         return Response(status=status.HTTP_400_BAD_REQUEST)
     # serialized_make = ProgramacaoSerializer.efetuarCompra()
 
-@api_view(['POST'])
-def meusCursos(request):
-    # cdc = ciencia de dados -> Categoria no banco Mysql
-    if request.data:
-        serialized_cousers = ProgramacaoSerializer.getMyCourses(request.data['cpf'])
-    return Response(serialized_cousers, status=status.HTTP_200_OK)
 
 @api_view(['POST'])
-def meusCursos(request):
-    # cdc = ciencia de dados -> Categoria no banco Mysql
-    if request.data:
-        serialized_cousers = ProgramacaoSerializer.getModules(request.data['idCurso'])
-    return Response(serialized_cousers, status=status.HTTP_200_OK)
+def login(request):
+    try:
+        if request.data:
+            serialized_login = ProgramacaoSerializer.efetuarLogin(
+                request.data['email'], request.data['senha'])
+            return Response(serialized_login, status=status.HTTP_200_OK)
 
-@api_view(['POST'])
-def minhasAulas(request):
-    # cdc = ciencia de dados -> Categoria no banco Mysql
-    if request.data:
-        serialized_cousers = ProgramacaoSerializer.getClass(request.data['idCurso'], request.data['idModulo'])
-    return Response(serialized_cousers, status=status.HTTP_200_OK)
-
-
+    except Exception as e:
+        print(e)
+        return Response(status=status.HTTP_400_BAD_REQUEST)

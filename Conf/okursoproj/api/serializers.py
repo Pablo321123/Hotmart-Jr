@@ -72,7 +72,8 @@ class ProgramacaoSerializer(serializers.Serializer):
         else:
             rows = responseProxy
             result = []
-            keys = ['idAula', 'duracaoMinutos', 'numero', 'codModulo', 'nomeAula']
+            keys = ['idAula', 'duracaoMinutos',
+                    'numero', 'codModulo', 'nomeAula']
             print(responseProxy)
             for row in rows:
                 result.append(dict(zip(keys, row)))
@@ -98,3 +99,20 @@ class ProgramacaoSerializer(serializers.Serializer):
     def getNextIDCompra():
         okursoProxy = OKursoProxy('Pablo', '1234')
         return okursoProxy.nextIdCompra()
+
+    @staticmethod
+    def efetuarLogin(email, senha):
+        okursoProxy = OKursoProxy('Pablo', '1234')
+        responseProxy = okursoProxy.login(email, senha)
+
+        if type(responseProxy) == str:
+            return responseProxy
+        else:
+            rows = responseProxy
+            result = []
+            keys = ['nome', 'email', 'cpf', 'senha']
+            print(responseProxy)
+            for row in rows:
+                result.append(dict(zip(keys, row)))
+
+            return result  # json.dumps(result)
