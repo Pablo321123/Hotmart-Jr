@@ -16,6 +16,10 @@ class DbPessoa:
         for r in listUsuarios:
             print(r)
 
+    def getAllCourses(self, cursor, comando):
+        cursor.execute(comando)
+        return cursor.fetchall()
+
     def getCourses(self, cursor, cpf):
         cursor.execute(
             f"SELECT co.comprador, cu.idCurso, cu.nomeCurso, cu.duracao, cu.categoria, cu.descricao, cu.autor FROM COMPRA as co JOIN Curso as cu ON co.codCurso = cu.idCurso WHERE co.comprador = {cpf}")
@@ -68,11 +72,15 @@ class OKursoProxy(DbPessoa):
                 super().getResult(self.dbCursor)
                 print(GREEN + 'Query realizada com sucesso!' + RESET)
 
-    def buscarCursos(self, categoria):
+    def buscarTodosCursos(self, categoria):
         try:
             if self.isPermission():
-                tuple = super().getCourses(
-                    f"SELECT * FROM Curso WHERE categoria = '{categoria}';", self.dbCursor)
+                if categoria == "":                    
+                    tuple = super().getAllCourses(self.dbCursor,
+                                                  f"SELECT * FROM Curso")
+                else:
+                    tuple = super().getAllCourses(self.dbCursor,
+                                                  f"SELECT * FROM Curso WHERE categoria = '{categoria}'")
                 return tuple
         except Exception as e:
             return f"{RED}{e}{RESET}"

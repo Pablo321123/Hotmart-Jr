@@ -10,7 +10,7 @@ class ProgramacaoSerializer(serializers.Serializer):
     def serializerCourses(categoria):
 
         okursoProxy = OKursoProxy('Pablo', '1234')
-        responseProxy = okursoProxy.buscarCursos(categoria)
+        responseProxy = okursoProxy.buscarTodosCursos(categoria)
 
         print(categoria)
 

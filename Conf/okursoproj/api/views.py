@@ -11,7 +11,10 @@ from rest_framework import status
 from .serializers import *
 
 # Metodos GET
-
+@api_view(['GET'])
+def todosCursos(request):
+    serialized_programacao = ProgramacaoSerializer.serializerCourses("")
+    return Response(serialized_programacao, status=status.HTTP_200_OK)
 
 @api_view(['GET'])
 def programacao(request):
