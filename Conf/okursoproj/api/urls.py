@@ -15,4 +15,5 @@ urlpatterns = [
     path('meusCursos/', meusCursos, name='my-cousers'),
     path('modulos/', getModulos, name='my-modules'),
     path('aulas/', minhasAulas, name='my-class'),
+    
 ]
