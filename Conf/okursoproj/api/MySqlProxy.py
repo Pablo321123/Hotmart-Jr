@@ -53,6 +53,10 @@ class DbPessoa:
             f"SELECT * FROM Usuario WHERE email = '{email}' AND senha = '{senha}'")
         return cursor.fetchall()
 
+    def deleteCourses(self, cursor, idCurso, cpf):
+        cursor.execute(
+            f"DELETE FROM compra WHERE codCurso = {idCurso} AND comprador = {cpf}")
+
 
 class OKursoProxy(DbPessoa):
     def __init__(self, userName, userKey) -> None:
@@ -75,13 +79,13 @@ class OKursoProxy(DbPessoa):
     def buscarTodosCursos(self, categoria):
         try:
             if self.isPermission():
-                if categoria == "":                    
+                if categoria == "":
                     tuple = super().getAllCourses(self.dbCursor,
                                                   f"SELECT * FROM Curso")
                 else:
                     tuple = super().getAllCourses(self.dbCursor,
                                                   f"SELECT * FROM Curso WHERE categoria = '{categoria}'")
-                return tuple 
+                return tuple
         except Exception as e:
             return f"{RED}{e}{RESET}"
 
@@ -147,3 +151,12 @@ class OKursoProxy(DbPessoa):
     def login(self, email, senha):
         if self.isPermission():
             return super().login(self.dbCursor, email, senha)
+
+    def deleteCourses(self, idCurso, cpf):
+        try:
+            if self.isPermission():
+                super().deleteCourses(self.dbCursor, idCurso, cpf)
+                return True
+        except Exception as e:
+            print(e)
+            return False

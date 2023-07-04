@@ -116,3 +116,10 @@ class ProgramacaoSerializer(serializers.Serializer):
                 result.append(dict(zip(keys, row)))
 
             return result  # json.dumps(result)
+
+    @staticmethod
+    def deleteUsario(idCurso, cpf):
+        okursoProxy = OKursoProxy('Pablo', '1234')
+        responseProxy = okursoProxy.deleteCourses(idCurso, cpf)
+
+        return responseProxy

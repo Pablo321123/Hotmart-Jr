@@ -11,10 +11,13 @@ from rest_framework import status
 from .serializers import *
 
 # Metodos GET
+
+
 @api_view(['GET'])
 def todosCursos(request):
     serialized_programacao = ProgramacaoSerializer.serializerCourses("")
     return Response(serialized_programacao, status=status.HTTP_200_OK)
+
 
 @api_view(['GET'])
 def programacao(request):
@@ -78,7 +81,7 @@ def getModulos(request):
 
 
 @api_view(['GET'])
-def minhasAulas(request):    
+def minhasAulas(request):
     if request.GET:
         serialized_class = ProgramacaoSerializer.getClass(
             request.GET.get('idCurso'), request.GET.get('idModulo'))
@@ -123,7 +126,7 @@ def login(request):
         if request.data:
             serialized_login = ProgramacaoSerializer.efetuarLogin(
                 request.data['email'], request.data['senha'])
-            
+
             print(serialized_login)
             if serialized_login != []:
                 return Response(serialized_login, status=status.HTTP_200_OK)
@@ -133,3 +136,13 @@ def login(request):
     except Exception as e:
         print(e)
         return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['POST'])
+def deleteCourse(request):
+    if request.data:
+        serialized_delete = ProgramacaoSerializer.deleteUsario(request.data['idCurso'],
+                                                               request.data["cpf"])
+        if serialized_delete:
+            return Response(serialized_delete, status=status.HTTP_200_OK)
+    return Response(serialized_delete, status=status.HTTP_400_BAD_REQUEST)
