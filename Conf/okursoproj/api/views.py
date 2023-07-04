@@ -123,7 +123,12 @@ def login(request):
         if request.data:
             serialized_login = ProgramacaoSerializer.efetuarLogin(
                 request.data['email'], request.data['senha'])
-            return Response(serialized_login, status=status.HTTP_200_OK)
+            
+            print(serialized_login)
+            if serialized_login != []:
+                return Response(serialized_login, status=status.HTTP_200_OK)
+            else:
+                return Response([], status=status.HTTP_400_BAD_REQUEST)
 
     except Exception as e:
         print(e)

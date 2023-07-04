@@ -81,7 +81,7 @@ class OKursoProxy(DbPessoa):
                 else:
                     tuple = super().getAllCourses(self.dbCursor,
                                                   f"SELECT * FROM Curso WHERE categoria = '{categoria}'")
-                return tuple
+                return tuple 
         except Exception as e:
             return f"{RED}{e}{RESET}"
 
